@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CipherTalk | Local Encrypted Chat</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="security-warning" class="security-warning hidden" role="alert">
+    DevTools detected. Sensitive data is protected, but avoid exposing the screen in untrusted environments.
+  </div>
+
+  <div id="app" class="app-shell">
+    <aside id="sidebar" class="sidebar" aria-label="Chat list">
+      <div class="sidebar-header">
+        <h2>CipherTalk</h2>
+        <button id="sidebar-close-btn" class="icon-btn" type="button" aria-label="Close sidebar">✕</button>
+      </div>
+
+      <label class="sidebar-behavior-row" for="sidebar-behavior-toggle">
+        <span>Sidebar behavior</span>
+        <input id="sidebar-behavior-toggle" type="checkbox" checked>
+      </label>
+
+      <div id="chat-list" class="chat-list"></div>
+    </aside>
+
+    <div id="sidebar-overlay" class="sidebar-overlay hidden" aria-hidden="true"></div>
+
+    <main class="main-panel">
+      <header class="main-header">
+        <button id="sidebar-open-btn" class="icon-btn" type="button" aria-label="Open sidebar">☰</button>
+        <div class="header-title">
+          <h1 id="active-chat-name">Secure Local Chat</h1>
+          <p id="active-chat-meta">AES-256-GCM encrypted storage in IndexedDB</p>
+        </div>
+        <div class="header-actions">
+          <button id="notify-permission-btn" type="button">Enable Alerts</button>
+          <button id="simulate-incoming-btn" type="button">Sim Incoming</button>
+          <button id="lock-now-btn" type="button" class="danger-soft">Lock</button>
+        </div>
+      </header>
+
+      <section id="messages" class="messages" aria-live="polite"></section>
+
+      <footer class="composer">
+        <div id="voice-recorder-panel" class="voice-recorder-panel hidden">
+          <span class="record-dot"></span>
+          <span id="voice-timer">0:00</span>
+          <button id="voice-send-btn" type="button">Send Voice</button>
+          <button id="voice-cancel-btn" type="button" class="danger-soft">Cancel</button>
+        </div>
+
+        <div class="composer-row">
+          <input id="message-input" type="text" placeholder="Type a secure message" autocomplete="off">
+          <button id="record-voice-btn" type="button" aria-label="Record voice">🎤</button>
+          <button id="send-btn" type="button">Send</button>
+        </div>
+      </footer>
+    </main>
+  </div>
+
+  <div id="lock-overlay" class="lock-overlay" role="dialog" aria-modal="true">
+    <div class="lock-card">
+      <h2 id="lock-title">Unlock Encrypted Vault</h2>
+      <p class="muted">Password mode derives a wrapping key with PBKDF2 and never stores plaintext keys.</p>
+      <input id="lock-password-input" type="password" placeholder="Password (optional)">
+      <div class="lock-actions">
+        <button id="unlock-button" type="button">Unlock / Start</button>
+        <button id="session-key-button" type="button" class="ghost">Continue Session Key Only</button>
+      </div>
+      <p id="lock-status" class="lock-status"></p>
+    </div>
+  </div>
+
+  <script type="module" src="src/chat.js"></script>
+</body>
+</html>

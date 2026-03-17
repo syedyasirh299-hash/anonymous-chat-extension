@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard • Anonymous Chat</title>
+  <link rel="stylesheet" href="admin.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <div class="page">
+    <header class="topbar">
+      <div>
+        <p class="eyebrow">Anonymous Chat</p>
+        <h1>Admin Dashboard</h1>
+        <p class="subtitle">Moderation and system stats. Only authenticated admins can view.</p>
+      </div>
+      <div class="top-actions">
+        <div class="admin-info">Admin Access Only</div>
+        <div class="pill" id="adminSession" hidden>
+          <span id="adminName"></span>
+          <button class="ghost" id="logoutBtn" type="button">Sign out</button>
+        </div>
+      </div>
+    </header>
+
+    <section class="card" id="loginCard">
+      <h2>Secure Admin Login</h2>
+      <div class="instructions">
+        <p>🔐 Only administrators can access moderation tools. Users consent via Terms & Conditions checkbox during signup.</p>
+        <ul>
+          <li>View total and online users</li>
+          <li>See active chats and groups</li>
+          <li>Review reported messages</li>
+          <li>Delete abusive messages and ban users</li>
+        </ul>
+      </div>
+      <p class="hint">Use the admin credentials configured on the server environment.</p>
+      <form id="loginForm" class="form-grid">
+        <label>Username
+          <input type="text" name="username" autocomplete="username" required>
+        </label>
+        <label>Password
+          <input type="password" name="password" autocomplete="current-password" required>
+        </label>
+        <button type="submit" class="primary">Sign in</button>
+        <p class="error" id="loginError" role="alert"></p>
+      </form>
+    </section>
+
+    <section class="card" id="dashboard" hidden>
+      <div class="toolbar">
+        <div class="actions">
+          <span class="pill muted" id="lastUpdated">Not synced</span>
+          <button class="ghost" id="refreshBtn" type="button">Refresh now</button>
+        </div>
+      </div>
+
+      <div class="grid stats">
+        <div class="stat"><p>Total Users</p><h3 id="totalUsers">—</h3></div>
+        <div class="stat"><p>Online Users</p><h3 id="onlineUsers">—</h3></div>
+        <div class="stat"><p>Active Chats (30d)</p><h3 id="activeChats">—</h3></div>
+        <div class="stat"><p>Total Groups</p><h3 id="totalGroups">—</h3></div>
+      </div>
+
+      <h2>Users</h2>
+      <div class="toolbar">
+        <div class="search">
+          <input type="search" id="searchUser" placeholder="Search by username or display name">
+          <button class="ghost" id="clearSearch" type="button">Clear</button>
+        </div>
+      </div>
+      <div class="table-wrapper">
+        <table>
+          <thead><tr><th>User ID</th><th>Username</th><th>Status</th><th>Last Seen</th><th>Actions</th></tr></thead>
+          <tbody id="userList"></tbody>
+        </table>
+      </div>
+
+      <h2>Groups</h2>
+      <div class="table-wrapper">
+        <table>
+          <thead><tr><th>Group Name</th><th>Group ID</th><th>Members</th><th>Messages</th><th>Actions</th></tr></thead>
+          <tbody id="groupList"></tbody>
+        </table>
+      </div>
+      <div class="table-wrapper compact">
+        <div class="toolbar"><span id="membersHeader" class="muted">Select a group to view members</span></div>
+        <table>
+          <thead><tr><th>Member</th><th>Actions</th></tr></thead>
+          <tbody id="memberList"></tbody>
+        </table>
+      </div>
+
+      <h2>Offline Messages</h2>
+      <div class="table-wrapper">
+        <table>
+          <thead><tr><th>User ID</th><th>Stored (undelivered)</th><th>Actions</th></tr></thead>
+          <tbody id="offlineList"></tbody>
+        </table>
+      </div>
+
+      <h2>Live Connected Users</h2>
+      <div class="table-wrapper">
+        <table>
+          <thead><tr><th>User ID</th><th>Username</th><th>Status</th></tr></thead>
+          <tbody id="liveUsers"></tbody>
+        </table>
+      </div>
+
+      <h2>Message Activity (Last Hour)</h2>
+      <canvas id="activityChart"></canvas>
+
+      <h2>Reports (user-submitted)</h2>
+      <div class="table-wrapper">
+        <table>
+          <thead><tr><th>Reporter</th><th>Message</th><th>Reason</th><th>When</th><th>Actions</th></tr></thead>
+          <tbody id="reportList"></tbody>
+        </table>
+      </div>
+
+      <h2>Chat Viewer</h2>
+      <div class="chat-viewer">
+        <div class="chat-side">
+          <p class="muted small">Select a user (press “Chats” on a user row)</p>
+          <div id="contactHeader" class="muted"></div>
+          <div class="table-wrapper compact">
+            <table>
+              <thead><tr><th>Contacts</th></tr></thead>
+              <tbody id="contactList"></tbody>
+            </table>
+          </div>
+        </div>
+        <div class="chat-main">
+          <div class="chat-head">
+            <div>
+              <div id="chatTitle" class="muted">No conversation selected</div>
+            </div>
+          </div>
+          <div class="conversation" id="conversation"></div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <template id="user-row-template">
+    <tr>
+      <td class="mono" data-field="id"></td>
+      <td data-field="username"></td>
+      <td data-field="status"></td>
+      <td data-field="lastSeen"></td>
+      <td class="actions-row">
+        <button class="danger" data-action="delete">Delete</button>
+        <button class="ghost" data-action="ban">Ban</button>
+        <button class="ghost" data-action="chats">Chats</button>
+      </td>
+    </tr>
+  </template>
+
+  <template id="live-user-row">
+    <tr>
+      <td class="mono" data-field="id"></td>
+      <td data-field="username"></td>
+      <td class="status status-online">Online</td>
+    </tr>
+  </template>
+
+  <template id="report-row">
+    <tr>
+      <td data-field="reporter"></td>
+      <td class="mono" data-field="text"></td>
+      <td data-field="reason"></td>
+      <td data-field="createdAt"></td>
+      <td class="actions-row">
+        <button class="ghost" data-action="dismiss">Dismiss</button>
+        <button class="danger" data-action="delete-msg">Delete message</button>
+      </td>
+    </tr>
+  </template>
+
+  <template id="group-row">
+    <tr>
+      <td data-field="name"></td>
+      <td class="mono" data-field="groupId"></td>
+      <td data-field="members"></td>
+      <td data-field="count"></td>
+      <td class="actions-row">
+        <button class="ghost" data-action="members">Members</button>
+        <button class="danger" data-action="delete-group">Delete</button>
+      </td>
+    </tr>
+  </template>
+
+  <template id="offline-row">
+    <tr>
+      <td class="mono" data-field="userId"></td>
+      <td data-field="count"></td>
+      <td class="actions-row">
+        <button class="ghost" data-action="view-offline">View</button>
+      </td>
+    </tr>
+  </template>
+
+  <template id="contact-row">
+    <tr>
+      <td data-field="contact"></td>
+    </tr>
+  </template>
+
+  <template id="member-row">
+    <tr>
+      <td data-field="member"></td>
+      <td class="actions-row"><button class="danger" data-action="remove-member">Remove</button></td>
+    </tr>
+  </template>
+
+  <script src="admin.js"></script>
+</body>
+</html>

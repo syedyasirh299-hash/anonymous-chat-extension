@@ -1,0 +1,58 @@
+{
+  "name": "anonymous-chat",
+  "version": "2.0.0",
+  "description": "Secure anonymous messaging with text and voice chat via Chrome extension with Node.js backend",
+
+  "main": "server/server.js",
+
+  "scripts": {
+    "start": "node server/server.js",
+    "dev": "DEBUG=* node server/server.js",
+    "test": "echo \"No tests configured yet\" && exit 0",
+    "lint": "eslint server/server.js 2>/dev/null || echo 'ESLint not installed'",
+    "reset-db": "rm -f server/anonymous-chat.db && echo 'Database deleted. Restart server to recreate.'"
+  },
+
+  "keywords": [
+    "chrome-extension",
+    "webrtc",
+    "p2p",
+    "messaging",
+    "anonymous",
+    "secure-chat"
+  ],
+
+  "author": "Anonymous Chat Team",
+  "license": "MIT",
+
+  "engines": {
+    "node": ">=14.0.0"
+  },
+
+  "dependencies": {
+    "express": "^4.18.2",
+    "ws": "^8.13.0",
+    "sqlite3": "^5.1.6",
+    "cors": "^2.8.5",
+    "uuid": "^9.0.0",
+    "bcrypt": "^5.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "dotenv": "^16.3.1"
+  },
+
+  "devDependencies": {
+    "eslint": "^8.50.0",
+    "nodemon": "^3.0.1"
+  },
+
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/anonymous-chat.git"
+  },
+
+  "bugs": {
+    "url": "https://github.com/yourusername/anonymous-chat/issues"
+  },
+
+  "homepage": "https://github.com/yourusername/anonymous-chat#readme"
+}
